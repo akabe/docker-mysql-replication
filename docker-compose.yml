@@ -1,0 +1,43 @@
+
+mysql_master:
+  image: mysql:5.7
+  volumes:
+    - $PWD/master/conf:/etc/mysql/conf.d
+    - $PWD/master/sql:/docker-entrypoint-initdb.d
+  ports:
+    - 3306:3306
+  environment:
+    MYSQL_DATABASE: axiz
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+mysql_slave_1:
+  image: mysql:5.7
+  volumes:
+    - $PWD/slave/conf_1:/etc/mysql/conf.d
+    - $PWD/slave/sql:/docker-entrypoint-initdb.d
+  ports:
+    - 3307:3306
+  links:
+    - mysql_master:master.mysql.local
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    REPL_MASTER_HOST: master.mysql.local
+    REPL_MASTER_PORT: 3306
+    REPL_MASTER_USER: root
+    REPL_MASTER_PASSWORD: ''
+
+mysql_slave_2:
+  image: mysql:5.7
+  volumes:
+    - $PWD/slave/conf_2:/etc/mysql/conf.d
+    - $PWD/slave/sql:/docker-entrypoint-initdb.d
+  ports:
+    - 3308:3306
+  links:
+    - mysql_master:master.mysql.local
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    REPL_MASTER_HOST: master.mysql.local
+    REPL_MASTER_PORT: 3306
+    REPL_MASTER_USER: root
+    REPL_MASTER_PASSWORD: ''
